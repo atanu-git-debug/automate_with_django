@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from dataentry.models import Student
 import csv
 from django.apps import apps
 from django.core.management import CommandError
@@ -17,10 +16,10 @@ class Command(BaseCommand):
 
         #logic
         file_path = kwargs['file_path']
-        model_name = kwargs['model_name']
+        model_name = kwargs['model_name'].capitalize()
         model = None
         # search for the model across all the installed apps
-        for app_config in apps.get_app_config():
+        for app_config in apps.get_app_configs():
             #try to search for the model in the app
             try:
                 model = apps.get_model(app_config.label,model_name)
