@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 import csv
 from django.apps import apps
-from django.core.management import CommandError
+
 #proposed command = manage.py importdata file_path model_name
 
 class Command(BaseCommand):
