@@ -8,11 +8,7 @@ import datetime
 
 
 class Command(BaseCommand):
-
     
-
-
-
     help = "Exports data from the database to a CSV file"
 
     def add_arguments(self,parser):
