@@ -16,7 +16,7 @@
 <body>
     <div class="container">
         <h3 class="text-center">Import data to database tables</h3>
-        <form action="{% url 'import_data' %}" method="POST" enctype="multipart/form-data" style="max-width: 600px; margin: auto; padding-top: 50px;">
+        <form action="{% url 'import_data' %}" method="POST" enctype="multipart/form-data" required style="max-width: 600px; margin: auto; padding-top: 50px;">
             {% csrf_token %}
             <div class="form-group">
                 <label for="file_path">Upload File</label>
@@ -27,7 +27,7 @@
 
             <div class="form-group">
                 <label for="file_path">Select Database Table</label>
-                <select name="model_name" id="" class="form-control">
+                <select name="model_name" id="" class="form-control" required>
                     <option value="" disabled selected>Select</option>
                     {% for model in all_models %}
                         {% if model != "User" %}
@@ -38,6 +38,8 @@
             </div>
 
             <input type="submit" value="Import Data" class="btn btn-primary">
+
+            {% include 'alert.html' %}
         </form>
     </div>
 </body>
