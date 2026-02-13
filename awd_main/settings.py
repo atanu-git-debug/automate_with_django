@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dataentry',
     'uploads',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +147,5 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 DEFAUL_FROM_EMAIL = 'Automate with django <maityatanu690@gmail.com>'
 DEFAUL_TO_EMAIL = 'imatanu0@gmail.com'
+
+CRISPY_TEMPLATE_PACK = 'Bootstrap5'
