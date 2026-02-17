@@ -4,7 +4,10 @@ from django.contrib import messages
 from dataentry.utils import send_email_notification
 from django.conf import settings
 from .models import Subscriber
+from django.contrib.auth.decorators import login_required
+from .tasks import send_email_task
 # Create your views here.
+@login_required(login_url='login')
 def send_emails(request):
     if request.method == 'POST':
         email_form = EmailForm(request.POST,request.FILES)
@@ -27,7 +30,10 @@ def send_emails(request):
                 attachment = email_form.attacthment.path
             else:
                 attachment = None
-            send_email_notification(mail_sub,message,to_email,attachment)
+
+            # Handover email sendin task to celery
+            send_email_task.delay(mail_sub,message,to_email,attachment)
+            
            
             #display a success message
             messages.success(request,"Email sent successfuly!")

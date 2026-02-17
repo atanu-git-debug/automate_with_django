@@ -7,7 +7,9 @@ from django.contrib import messages
 from .tasks import import_data_task,export_data_task
 from . utils import check_csv_errors
 from django.core.management import call_command
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+@login_required(login_url='login')
 def import_data(request):
     if request.method == 'POST':
         # Handle file upload and data import logic here
@@ -45,6 +47,8 @@ def import_data(request):
         }    
     return render(request,'dataentry/import_data.html',context)
 
+
+@login_required(login_url='login')
 def export_data(request):
     if request.method == 'POST':
         model_name = request.POST.get('model_name')

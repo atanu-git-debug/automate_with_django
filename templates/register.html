@@ -10,7 +10,10 @@
 
                 {{form | crispy}}
 
-                <input type="submit" value="Register" class="btn btn-success">
+                <small><a href="{% url 'login' %}">Already have an account ? Login</a></small><br>
+
+                <input type="submit" value="Register" class="btn btn-success mt-3">
+                
 
             </div>
             {% include 'alert.html' %}       
