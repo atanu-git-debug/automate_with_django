@@ -1,3 +1,5 @@
+import hashlib
+import time
 from django.apps import apps
 from django.core.management.base import CommandError
 import csv
@@ -6,6 +8,8 @@ from django.db import DataError
 from django.core.mail import EmailMessage
 from django.conf import settings
 import datetime
+from emails.models import Email,Sent,EmailTracking, Subscriber
+from bs4 import BeautifulSoup
 
 def get_all_custom_models():
     default_models = {'LogEntry', 'ContentType', 'Session', 'Group', 'Permission','Upload'}
@@ -44,18 +48,63 @@ def check_csv_errors(file_path,model_name):
     return model
 
 
-def send_email_notification(mail_sub,message,to_email,attachment=None):
+def send_email_notification(mail_sub,message,to_email,attachment=None,email_id=None):
 
     try:
         from_email  = settings.DEFAUL_FROM_EMAIL
+        for recipent_email in to_email:
+            new_message = message
+            # create email trackin recorde
+            if email_id:
+                email = Email.objects.get(pk=email_id)
+                subscriber = Subscriber.objects.get(email_list=email.email_list,email_address=recipent_email)
+                timestamp = str(time.time())
+                data_to_hash = f"{recipent_email}{timestamp}"
+                unique_id = hashlib.sha256(data_to_hash.encode()).hexdigest()
+                email_tracking = EmailTracking.objects.create(
+                    email = email,
+                    subscriber = subscriber,
+                    unique_id = unique_id
+                )                   
+                #generate the tracking pixel
+                base_url = settings.BASE_URL
+                click_tracking_url = f"{base_url}/emails/track/click/{unique_id}"
+                open_tracking_url = f"{base_url}/emails/track/open/{unique_id}"
+                
 
+                # search for the links in email body
+                soup = BeautifulSoup(message,'html.parser')
+                urls = [url['href'] for url in soup.find_all('a',href=True)]
+                
+                # If there are links or url in the eamil body , inject our trackin url to that
+                if urls :
+                    for url in urls:
+                        
+                        # make the final tracking url
+                        tracking_url = f"{click_tracking_url}?url={url}"
+                        print(f'tracking_url: {tracking_url}')
+                        new_message = new_message.replace(f'{url}',f'{tracking_url}')
+                else:
+                    
+                    print('No urls Found in the email content')
+                
+                # Create the em email content with the open tracking pixel
+                open_tracking_img = f"<img src='{open_tracking_url}' width='1' height='1'>"
+                new_message += open_tracking_img
+            
 
-        mail = EmailMessage(mail_sub,message,from_email,to=to_email)
-        if attachment is not None:
-            mail.attach_file(attachment)
+            mail = EmailMessage(mail_sub,new_message,from_email,to=[recipent_email])
+            if attachment is not None:
+                mail.attach_file(attachment)
         
         mail.content_subtype = 'html'
         mail.send()
+        # store the total sent emails
+        if email_id:
+            sent = Sent()
+            sent.email = email
+            sent.total_sent = email.email_list.count_emails()
+            sent.save()
     except Exception as e:
         raise e
     

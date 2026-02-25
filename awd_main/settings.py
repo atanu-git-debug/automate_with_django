@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG',default=False,cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -226,3 +226,6 @@ ANYMAIL = {
     # (exact settings here depend on your ESP...)
     "SENDINBLUE_API_KEY": config("SENDINBLUE_API_KEY"),
 }
+
+CSRF_TRUSTED_ORIGINS = ['https://nonbenevolent-unmeritoriously-margie.ngrok-free.dev']
+BASE_URL = 'https://nonbenevolent-unmeritoriously-margie.ngrok-free.dev'

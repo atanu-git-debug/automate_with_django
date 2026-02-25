@@ -9,6 +9,10 @@ class List(models.Model):
     def __str__(self):
         return self.email_list
     
+    def count_emails(self):
+        count = Subscriber.objects.filter(email_list=self).count()
+        return count
+    
 class Subscriber(models.Model):
     
 
@@ -29,3 +33,42 @@ class Email(models.Model):
 
     def __str__(self):
         return self.subject
+
+    def open_rate(self):
+        total_sent = self.email_list.count_emails()
+        open_count = EmailTracking.objects.filter(email=self,opened_at__isnull=False).count()
+        # formula
+        open_rate = (open_count/total_sent)*100 if total_sent > 0 else 0
+        rounded_open_rate = round(open_rate,2)
+        return rounded_open_rate
+    
+    def click_rate(self):
+        total_sent = self.email_list.count_emails()
+        opend_count = EmailTracking.objects.filter(email=self,opened_at__isnull=False).count()
+        
+        
+        if opend_count > 0:
+            click_count = EmailTracking.objects.filter(email=self,clicked_at__isnull=False).count()
+            #formula
+            click_rate = round((click_count/opend_count)*100,2)
+        else:
+            click_rate = 0
+        return click_rate
+    
+
+class Sent(models.Model):
+
+    email = models.ForeignKey(Email,on_delete=models.CASCADE,null=True,blank=True)
+    total_sent = models.IntegerField()
+
+    def __str__(self):
+        return str(self.email) + '-' + str(self.total_sent) + ' Emails Sent'
+class EmailTracking(models.Model):
+    email = models.ForeignKey(Email,on_delete=models.CASCADE,null=True,blank=True)
+    subscriber = models.ForeignKey(Subscriber,on_delete=models.CASCADE,null=True,blank=True)
+    unique_id = models.CharField(max_length=255,unique=True)
+    opened_at = models.DateTimeField(null=True,blank=True)
+    clicked_at = models.DateTimeField(null=True,blank=True)
+
+    def __str__(self):
+        return self.email.subject
