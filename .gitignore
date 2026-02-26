@@ -175,3 +175,4 @@ cython_debug/
 
 celerycommandToStart
 test.py
+stock.py
