@@ -3,10 +3,11 @@ from urllib import response
 from django.shortcuts import redirect, render,HttpResponse
 from PIL import Image
 import io
-
+from django.contrib.auth.decorators import login_required
 from .forms import CompressImageForm
 
 # Create your views here.
+@login_required(login_url='login')
 def compress(request):
     user = request.user
     if request.method == 'POST':

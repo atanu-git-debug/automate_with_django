@@ -49,7 +49,7 @@ def send_emails(request):
             'email_form' : email
         }
     return render(request,'emails/send-emails.html',context)
-
+@login_required(login_url='login')
 def track_dashboard(request):
     emails = Email.objects.all().annotate(total_sent=Sum('sent__total_sent')).order_by('-sent_at')
 
@@ -58,7 +58,7 @@ def track_dashboard(request):
         'emails' : emails
     }
     return render(request,'emails/track_dashboard.html',context)
-
+@login_required(login_url='login')
 def track_click(request,unique_id):
     try:
         email_tracking = EmailTracking.objects.get(unique_id=unique_id)
@@ -72,7 +72,7 @@ def track_click(request,unique_id):
             return HttpResponseRedirect(url)
     except:
         return HttpResponse('Email tracking recorde not fornd')
-
+@login_required(login_url='login')
 def track_open(request,unique_id):
     try:
         email_tracking = EmailTracking.objects.get(unique_id=unique_id)
@@ -85,6 +85,7 @@ def track_open(request,unique_id):
             return HttpResponse('Email opend already')
     except:
         return HttpResponse('Email tracking recorde not fornd') 
+@login_required(login_url='login')
 def track_stats(request,pk):
     email = get_object_or_404(Email,pk=pk)
     sent = Sent.objects.get(email=email)
