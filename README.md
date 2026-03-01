@@ -142,8 +142,8 @@ Each automation feature is separated into independent Django apps to maintain cl
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/atanu-git-debug/automate_with_django.git
+cd automate_with_django
 ```
 
 ### 2️⃣ Create Virtual Environment
